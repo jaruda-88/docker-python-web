@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Register Form</title>
+    </head>
+    <body>
+        <div>
+            <h1>회원가입</h1>
+        </div>
+        <div>
+            <div>
+                <label for="userid">아이디</label>
+                <input type="text" id="userid" placeholder="아이디" name="userid"/>
+            </div>
+            <div>
+                <label for="username">이름</label>
+                <input type="text" id="username" placeholder="이름" name="username"/>
+            </div>
+            <div>
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" placeholder="비밀번호" name="password"/>
+            </div>
+            <div>
+                <label for="re_password">비밀번호 확인</label>
+                <input type="password" id="re_password" placeholder="비밀번호 확인" name="re_password"/>
+            </div>
+            <button type="button" onclick="post_register()">register</button>
+        </div>
+    </body>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script>
+        function post_register() {
+            var userid = $('#userid').val();
+            var usernm = $('#username').val();
+            var pw = $('#password').val();
+
+            $.ajax({
+                type: 'GET',
+                url: 'http://localhost:5040/api/registration_user',
+                data: {"pw": pw, "userid": userid, "usernm": usernm},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    //xhr.setRequestHeader("Authorization","JWT " + token);
+                },
+                success: function (response) {
+                    console.log(response)
+                },
+                error: function(xhr, exception) {
+                    console.log("error > xhr.status:" + xhr.status);
+                    console.log("error > exception: " + exception);
+                },
+                complete: function(response, status, xhr) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
+</html>
