@@ -33,10 +33,10 @@
         function post_register() {
             var userid = $('#userid').val();
             var usernm = $('#username').val();
-            var pw = $('#password').val();
+            var pw = $('#pw').val();
 
             $.ajax({
-                type: 'GET',
+                type: 'POST',
                 url: 'http://localhost:5040/api/registration_user',
                 data: {"pw": pw, "userid": userid, "usernm": usernm},
                 beforeSend: function (xhr) {
