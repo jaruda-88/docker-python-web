@@ -33,25 +33,20 @@
         function post_register() {
             var userid = $('#userid').val();
             var usernm = $('#username').val();
-            var pw = $('#pw').val();
+            var pw = $('#password').val();
 
             $.ajax({
                 type: 'POST',
-                url: 'http://localhost:5040/api/registration_user',
-                data: {"pw": pw, "userid": userid, "usernm": usernm},
+                url: 'http://localhost:5040/api/user',
+                data:  JSON.stringify({"pw": pw, "userid": userid, "username": usernm}),
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Content-type","application/json");
-                    //xhr.setRequestHeader("Authorization","JWT " + token);
                 },
                 success: function (response) {
-                    console.log(response)
+                    alert(response['resultMsg'])
                 },
                 error: function(xhr, exception) {
-                    console.log("error > xhr.status:" + xhr.status);
-                    console.log("error > exception: " + exception);
-                },
-                complete: function(response, status, xhr) {
-                    console.log(response);
+                    console.log("error" + exception);
                 }
             });
         }
