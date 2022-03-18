@@ -37,16 +37,22 @@
 
             $.ajax({
                 type: 'POST',
-                url: 'http://localhost:5040/api/user',
+                url: 'http://localhost:5040/api/user/registration',
                 data:  JSON.stringify({"pw": pw, "userid": userid, "username": usernm}),
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Content-type","application/json");
                 },
                 success: function (response) {
-                    alert(response['resultMsg'])
+                    var msg = response['resultMsg']
+                    alert(msg)
+                    window.location.href = "/login"
                 },
                 error: function(xhr, exception) {
-                    console.log("error" + exception);
+                    console.log("error_status : " + xhr.status);
+                    console.log("error_Msg : " + xhr.responseText);
+                    var err = JSON.parse(xhr.responseText)
+                    console.log("error_resultCode : " + err['resultCode'])
+                    alert(err['resultMsg'])
                 }
             });
         }

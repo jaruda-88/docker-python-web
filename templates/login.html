@@ -6,7 +6,7 @@
     </head>
     <body>
         <h1>Login page</h1>
-        ID<input type="text" id="username" name="username" >
+        ID<input type="text" id="userid" name="userid" >
         PW <input type="password" id="password" name="password" >
         <button type="button" onclick="post_login()">login</button>
         <button type="button" onclick="location.href='/login/register'">register</button>
@@ -14,14 +14,15 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
     <script>
         function post_login() {
-            var nm = $('#username').val();
+            var id = $('#userid').val();
             var pw = $('#password').val();
             $.ajax({
-                type: 'GET',
-                url: 'http://localhost:5040/api/sample',
+                type: 'POST',
+                url: 'http://localhost:5040/api/user/login',
+                data:  JSON.stringify({"pw": pw, "userid": id}),
                 beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-type","application/json");
-                    //xhr.setRequestHeader("Authorization","JWT " + token);
+                     xhr.setRequestHeader("Content-type","application/json");
+                     //xhr.setRequestHeader("Authorization","JWT " + token);
                 },
                 success: function (response) {
                     console.log(response)
