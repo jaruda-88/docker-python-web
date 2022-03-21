@@ -11,7 +11,8 @@
         <button type="button" onclick="post_login()">login</button>
         <button type="button" onclick="location.href='/login/register'">register</button>
     </body>
-    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script>
         function post_login() {
             var id = $('#userid').val();
@@ -25,10 +26,21 @@
                      //xhr.setRequestHeader("Authorization","JWT " + token);
                 },
                 success: function (response) {
-                    console.log(response)
+                    var resultCode = response['resultCode'];
+                    var resultMsg = response['resultMsg'];
+                    if(resultCode == 200)
+                    {
+                        $.cookie('token', resultMsg);
+                        // 키로 사용한 이름으로 값을 읽습니다. 
+                        // 키로 저장된 값이 없으면 undefined 가 반환됩니다. $.cookie('name'); // => "value"
+                    }
                 },
                 error: function(xhr, exception) {
-                    console.log("error > xhr.status:" + xhr.status + "error > exception: " + exception);
+                    console.log("error_status : " + xhr.status);
+                    console.log("error_Msg : " + xhr.responseText);
+                    var err = JSON.parse(xhr.responseText)
+                    console.log("error_resultCode : " + err['resultCode'])
+                    alert(err['resultMsg'])
                 },
                 complete: function(response, status, xhr) {
                     console.log(response);
