@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  web:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile-web
+    networks:
+      - default
+      - my_net
+    ports:
+      - "5050:5050"
+    container_name: web
+
+
+networks:
+  my_net:
+    driver: bridge

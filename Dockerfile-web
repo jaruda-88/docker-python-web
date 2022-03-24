@@ -1,0 +1,16 @@
+FROM python:3.8.5
+
+COPY requirements.txt .
+
+RUN apt-get update
+RUN pip3 install --upgrade pip
+RUN pip install -r requirements.txt
+
+WORKDIR /app
+
+COPY . /app
+
+EXPOSE 5000
+
+CMD ["python3", "-u", "app.py"]
+
