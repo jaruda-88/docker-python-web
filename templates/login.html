@@ -2,29 +2,48 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>login</title>        
+        <title>login</title>      
+        <script src="{{url_for('static',filename='js/common.js')}}"></script>
     </head>
     <body>
         <h1>Login page</h1>
-        ID<input type="text" id="userid" name="userid" >
-        PW <input type="password" id="password" name="password" >
-        <button type="button" onclick="post_login()">login</button>
-        <button type="button" onclick="location.href='/login/register'">register</button>
-        <button type="button" onclick="get_userinfo()">get_userinfo</button>
+        <div id="login">
+            ID<input type="text" id="userid" name="userid" >
+            PW <input type="password" id="password" name="password" >
+            <button type="button" onclick="post_login()">login</button>
+            <button type="button" onclick="location.href='/login/register'">register</button>
+        </div>
+        <div id="signin">
+            <button type="button" onclick="logout()">logout</button>
+            <span id="msg"> </span>
+        </div>
     </body>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script>
+        var token = $.cookie('token');
+
+        if(token == undefined)
+        {
+            $("#login").css("display","block");
+            $("#signin").css("display","none");
+        }
+        else
+        {
+            $("#login").css("display","none");
+            $("#signin").css("display","block");
+            get_userinfo();
+        }
+
         function post_login() {
             var id = $('#userid').val();
             var pw = $('#password').val();
             $.ajax({
                 type: 'POST',
-                url: 'http://localhost:5040/api/user/login',
+                url: url + 'user/login',
                 data:  JSON.stringify({"pw": pw, "userid": id}),
                 beforeSend: function (xhr) {
                      xhr.setRequestHeader("Content-type","application/json");
-                     //xhr.setRequestHeader("Authorization","JWT " + token);
                 },
                 success: function (response) {
                     var resultCode = response['resultCode'];
@@ -32,9 +51,9 @@
                     if(resultCode == 200)
                     {
                         $.cookie('token', resultMsg);
-                        alert("login!")
-                        // 키로 사용한 이름으로 값을 읽습니다. 
-                        // 키로 저장된 값이 없으면 undefined 가 반환됩니다. $.cookie('name'); // => "value"
+                        $("#login").css("display","none");
+                        $("#signin").css("display","block");
+                        get_userinfo();
                     }
                 },
                 error: function(xhr, exception) {
@@ -50,11 +69,17 @@
             });
         }
 
+        function logout(){
+            $.removeCookie('token');
+            token = undefined;
+            location.reload();
+        }
+
         function get_userinfo(){
-            var token = $.cookie('token');
+            token = $.cookie('token');
             if(token == undefined)
             {
-                alert("not token")
+                alert("None token")
             }
             else
             {
@@ -70,7 +95,8 @@
                     var resultMsg = response['resultMsg'];
                     if(resultCode == 200)
                     {
-                        alert(resultMsg);
+                        //alert(resultMsg);
+                        $('#msg').text("signin : " + resultMsg['userid']);
                     }
                 },
                 error: function(xhr, exception) {
