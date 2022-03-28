@@ -1,3 +1,18 @@
-const BUILD = 0;
+let api = {
+    type: "server",
 
-let url = BUILD == 0 ? 'http://3.38.135.214:5040/api/' : 'http://localhost:5040/api/';
+    get url()
+    {
+        switch(type)
+        {
+            case "server":
+                return 'http://3.38.135.214:5040/api';
+            case "local":
+                return 'http://192.168.1.69:5040/api';
+            case "develop":
+                return 'http://localhost:5040/api';
+            default:
+                return '';
+        }
+    }
+};

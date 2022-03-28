@@ -40,7 +40,7 @@
             var pw = $('#password').val();
             $.ajax({
                 type: 'POST',
-                url: url + 'user/login',
+                url: api.url + '/user/login',
                 data:  JSON.stringify({"pw": pw, "userid": id}),
                 beforeSend: function (xhr) {
                      xhr.setRequestHeader("Content-type","application/json");
@@ -85,7 +85,7 @@
             {
                 $.ajax({
                 type: 'GET',
-                url: 'http://localhost:5040/api/user',
+                url: api.url + '/api/user',
                 beforeSend: function (xhr) {
                      xhr.setRequestHeader("Content-type","application/json");
                      xhr.setRequestHeader("Authorization",token);

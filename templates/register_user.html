@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Register Form</title>
+        <script src="{{url_for('static',filename='js/common.js')}}"></script>
     </head>
     <body>
         <div>
@@ -34,10 +35,17 @@
             var userid = $('#userid').val();
             var usernm = $('#username').val();
             var pw = $('#password').val();
+            var re_pw = $('#re_password').val();
+            
+            if(pw != re_pw)
+            {
+                alert('Confirm password match');
+                return;
+            }
 
             $.ajax({
                 type: 'POST',
-                url: 'http://localhost:5040/api/user/registration',
+                url: api.url + '/api/user/registration',
                 data:  JSON.stringify({"pw": pw, "userid": userid, "username": usernm}),
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Content-type","application/json");
