@@ -1,8 +1,13 @@
 from flask import Flask
-import views.login as login
+import views.index as index
+import views.register as register
+import views.board as board
+
 
 app = Flask(__name__)
-app.register_blueprint(login.bp)
+app.register_blueprint(index.bp)
+app.register_blueprint(register.bp)
+app.register_blueprint(board.bp)
 
 
 if __name__ == '__main__':

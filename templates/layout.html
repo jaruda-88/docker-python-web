@@ -1,0 +1,161 @@
+<html lang="kr">
+    <head>
+        <meta charset="utf-8">
+        <script src="{{url_for('static',filename='js/common.js')}}"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <style>
+            .menu{ text-align: center; }
+            .link{ float: left; }
+            .login{ float: right; }
+            .logout{ float: right; }
+            ul {
+                list-style-type: none;
+                margin: 0px;
+                padding: 0px;
+                float: left;
+            }
+            li{
+                margin: 0px;
+                margin-right: 15px;
+                padding: 0px;
+                float: left;
+            } 
+        </style>
+        <title>project1</title>
+    </head>
+
+    <body>
+        <header>
+            <div class="menu">
+                <div class="link">
+                    <ul>
+                        <li><a href="/index">Home</a></li>
+                        <li><a id="board" href='javascript:void(0);' onclick="register();">Board</a></li>
+                    </ul>
+                </div>
+                <div class="login" id="before_singin">
+                    ID<input type="text" id="userid" name="userid" >
+                    PW <input type="password" id="password" name="password" >
+                    <button type="button" onclick="post_login()">login</button>
+                    <button type="button" onclick="register()">register</button>
+                </div>
+                <div class="logout" id="after_singin">
+                    <span id="msg"> </span>
+                    <button type="button" onclick="logout()">logout</button>
+                </div>
+            </div>
+        </header>
+        </br></br></br></br>
+        <main role="index">
+            <div>
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </body>
+    <script>
+        check_token();
+
+        function post_login() {
+            var id = $('#userid').val();
+            var pw = $('#password').val();
+            $.ajax({
+                type: 'POST',
+                url: api.url + '/user/login',
+                data:  JSON.stringify({"pw": pw, "userid": id}),
+                beforeSend: function (xhr) {
+                     xhr.setRequestHeader("Content-type","application/json");
+                },
+                success: function (response) {
+                    var resultCode = response['resultCode'];
+                    var resultMsg = response['resultMsg'];
+                    if(resultCode == 200)
+                    {
+                        $.cookie('token', resultMsg);
+                        location.reload();
+                    }
+                },
+                error: function(xhr, exception) {
+                    console.log("error_status : " + xhr.status);
+                    console.log("error_Msg : " + xhr.responseText);
+                    var err = JSON.parse(xhr.responseText)
+                    console.log("error_resultCode : " + err['resultCode'])
+                    alert(err['resultMsg'])
+                },
+                complete: function(response, status, xhr) {
+                    console.log(response);
+                }
+            });
+        }
+
+        function register(){
+            window.location.href = "/register"
+        }
+
+        function logout(){
+            $.removeCookie('token');
+            location.reload();
+        }      
+        
+        function check_token()
+        {
+            var token = $.cookie('token');
+            if(token == undefined)
+            {
+                $("#before_singin").css("display","block");
+                $("#after_singin").css("display","none");
+                $("#board").css("display","none");
+            }
+            else
+            {
+                $("#before_singin").css("display","none");
+                $("#after_singin").css("display","block");
+                $("#board").css("display","block");
+                get_userinfo();
+            }
+        }
+
+        function get_userinfo()
+        {
+            var token = $.cookie('token');
+            if(token == undefined)
+            {
+                alert("None token")
+            }
+            else
+            {
+                $.ajax({
+                type: 'GET',
+                url: api.url + '/user',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader("Authorization",token);
+                },
+                success: function (response) {
+                    var resultCode = response['resultCode'];
+                    var resultMsg = response['resultMsg'];
+                    if(resultCode == 200)
+                    {
+                        $('#msg').text("signin : " + resultMsg['userid']);
+                    }
+                },
+                error: function(xhr, exception) {
+                    console.log("error_status : " + xhr.status);
+                    console.log("error_Msg : " + xhr.responseText);
+                    var err = JSON.parse(xhr.responseText);
+                    console.log("error_resultCode : " + err['resultCode'])
+                    if(err['resultCode'] == 406)
+                    {
+                        alert(err['resultMsg']);
+                        $.removeCookie('token');
+                        location.reload();
+                    }
+                },
+                complete: function(response, status, xhr) {
+                    console.log(response);
+                }
+            });
+            }
+        }
+    </script>
+</html>

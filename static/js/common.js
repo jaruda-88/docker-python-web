@@ -1,5 +1,5 @@
 let api = {
-    type: "server",
+    type: "develop",
 
     get url()
     {
@@ -16,3 +16,4 @@ let api = {
         }
     }
 };
+
