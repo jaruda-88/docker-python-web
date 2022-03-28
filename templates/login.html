@@ -85,7 +85,7 @@
             {
                 $.ajax({
                 type: 'GET',
-                url: api.url + '/api/user',
+                url: api.url + '/user',
                 beforeSend: function (xhr) {
                      xhr.setRequestHeader("Content-type","application/json");
                      xhr.setRequestHeader("Authorization",token);

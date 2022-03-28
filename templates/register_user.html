@@ -45,7 +45,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: api.url + '/api/user/registration',
+                url: api.url + '/user/registration',
                 data:  JSON.stringify({"pw": pw, "userid": userid, "username": usernm}),
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Content-type","application/json");
