@@ -3,7 +3,7 @@ let api = {
 
     get url()
     {
-        switch(type)
+        switch(this.type)
         {
             case "server":
                 return 'http://3.38.135.214:5040/api';
