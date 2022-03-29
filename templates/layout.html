@@ -1,5 +1,6 @@
 <html lang="kr">
     <head>
+        {% block head %}
         <meta charset="utf-8">
         <script src="{{url_for('static',filename='js/common.js')}}"></script>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -23,6 +24,7 @@
             } 
         </style>
         <title>project1</title>
+        {% endblock %}
     </head>
 
     <body>
@@ -31,7 +33,7 @@
                 <div class="link">
                     <ul>
                         <li><a href="/index">Home</a></li>
-                        <li><a id="board" href='javascript:void(0);' onclick="register();">Board</a></li>
+                        <li><a id="board" href='javascript:void(0);' onclick="board();">Board</a></li>
                     </ul>
                 </div>
                 <div class="login" id="before_singin">
@@ -53,6 +55,7 @@
             </div>
         </main>
     </body>
+    {% block extend %}
     <script>
         check_token();
 
@@ -90,6 +93,10 @@
 
         function register(){
             window.location.href = "/register"
+        }
+
+        function board(){
+            window.location.href = "/board"
         }
 
         function logout(){
@@ -158,4 +165,5 @@
             }
         }
     </script>
+    {% endblock %}
 </html>
