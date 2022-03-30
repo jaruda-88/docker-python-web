@@ -1,13 +1,91 @@
-{% extends 'layout.html' %}
-
-{% block head %}
-{{ super() }}
-{% endblock %}
+{% extends "index.html" %}
 
 {% block content %}
-작업해야함
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
+        <h2 class="ui teal image header">
+            게시판 페이지
+        </h2>
+        <div class="ui large form">
+            <div class="ui stacked segment">
+               <button class="ui fluid large teal submit button">게시글 작성하기</button>
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>제목</th>
+                            <th>등록자</th>
+                            <th>등록일</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list">
+                        <tr>
+                            <td>a</td>
+                            <td>b</td>
+                            <td>c</td>
+                            <td>d</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ui error message"></div>
+
+        </div>
+    </div>
+</div>
 {% endblock %}
 
-{% block extend %}
-{{ super() }}
-{% endblock %}
+
+<!-- <div class="ui middle aligned center aligned grid">
+    <div class="column">
+        <h2 class="ui teal image header">
+            게시판 페이지
+        </h2>
+        <div class="ui large form">
+            <div class="ui stacked segment">
+               <button class="ui fluid large teal submit button">게시글 작성하기</button>
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>제목</th>
+                            <th>등록자</th>
+                            <th>등록일</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list">
+                        <tr>
+                            <td>a</td>
+                            <td>b</td>
+                            <td>c</td>
+                            <td>d</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ui error message"></div>
+
+        </div>
+    </div>
+</div>
+
+<button type="button" onclick="test();">ddddd</button>
+
+<script src="{{url_for('static',filename='js/common.js')}}"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+function test()
+{
+    var tr = $("<tr></tr>").attr("data-id", "test").appendTo("#list");
+    //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
+    $("<td></td>").text("a").addClass("view_btn").appendTo(tr);
+    $("<td></td>").text("b").addClass("view_btn").appendTo(tr);
+    $("<td></td>").text("C").addClass("view_btn").appendTo(tr);
+    $("<td></td>").text("D").addClass("view_btn").appendTo(tr);
+
+    var token = sessionStorage.getItem('token')
+    console.log(token)
+}
+</script> -->
