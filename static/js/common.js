@@ -1,5 +1,5 @@
 let api = {
-    type: "develop",
+    type: "server",
 
     get url()
     {
