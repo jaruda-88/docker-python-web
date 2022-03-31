@@ -30,8 +30,8 @@
                 <div class="link">
                     <ul>
                         <li><a href="/index">Home</a></li>
-                        <li><a id="board" href="/board">board</a></li>
-                        <!-- <li><a id="board" href='javascript:void(0);' onclick="onclick_board();">Board</a></li> -->
+                        <!-- <li><a id="board" href="/board">board</a></li> -->
+                        <li><a id="board" href='javascript:void(0);' onclick="onclick_board();">Board</a></li>
                     </ul>
                 </div>
                 <div class="login" id="before_singin">
@@ -97,6 +97,14 @@
         }
 
         function onclick_board(){
+            if(check_token() == false)
+            {
+                alert("please singin");
+            }
+            else
+            {
+                window.location.href = "/board"
+            }
             //$("#view_voard").css("display","block");
         }
 
@@ -112,14 +120,14 @@
             {
                 $("#before_singin").css("display","block");
                 $("#after_singin").css("display","none");
-                $("#board").css("display","none");
+                return false;
             }
             else
             {
                 $("#before_singin").css("display","none");
                 $("#after_singin").css("display","block");
-                $("#board").css("display","block");
                 get_userinfo();
+                return true;
             }
         }
 
