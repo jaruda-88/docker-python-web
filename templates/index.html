@@ -1,5 +1,6 @@
 <html lang="kr">
     <head>
+        {% block head %}
         <meta charset="utf-8">
         <script src="{{url_for('static',filename='js/common.js')}}"></script>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -22,6 +23,7 @@
             } 
         </style>
         <title>project1</title>
+        {% endblock %}
     </head>
 
     <body>
@@ -55,6 +57,7 @@
             {% endblock %}
         </main>
     </body>
+    {% block extent %}
     <script>
         $("#view_voard").css("display","none");
 
@@ -104,6 +107,18 @@
             else
             {
                 window.location.href = "/board"
+
+                // $.ajax({
+                //     type: "POST",
+                //     url: "/board",
+                //     data: {"token": sessionStorage.getItem('token')},
+                //     success: function(res){
+                //         //window.location.href = "/board"
+                //     },
+                //     error: function() {
+                //         location.reload();
+                //     }
+                // })
             }
             //$("#view_voard").css("display","block");
         }
@@ -160,9 +175,9 @@
                     console.log("error_Msg : " + xhr.responseText);
                     var err = JSON.parse(xhr.responseText);
                     console.log("error_resultCode : " + err['resultCode'])
-                    if(err['resultCode'] == 406)
+                    alert(err['resultMsg']);
+                    if(err['resultCode'] == 406 || err['resultCode'] == 401)
                     {
-                        alert(err['resultMsg']);
                         sessionStorage.removeItem('token');
                         location.reload();
                     }
@@ -174,4 +189,5 @@
             }
         }
     </script>
+    {% endblock %}
 </html>

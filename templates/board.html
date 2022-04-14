@@ -1,91 +1,117 @@
 {% extends "index.html" %}
 
-{% block content %}
-<div class="ui middle aligned center aligned grid">
-    <div class="column">
-        <h2 class="ui teal image header">
-            게시판 페이지
-        </h2>
-        <div class="ui large form">
-            <div class="ui stacked segment">
-               <button class="ui fluid large teal submit button">게시글 작성하기</button>
-                <table class="ui celled table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>제목</th>
-                            <th>등록자</th>
-                            <th>등록일</th>
-                        </tr>
-                    </thead>
-                    <tbody id="list">
-                        <tr>
-                            <td>a</td>
-                            <td>b</td>
-                            <td>c</td>
-                            <td>d</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="ui error message"></div>
-
-        </div>
-    </div>
-</div>
+{% block head %}
+    {{ super() }}
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" src="{{url_for('static',filename='css/dashboard.css')}}">    
 {% endblock %}
 
-
-<!-- <div class="ui middle aligned center aligned grid">
-    <div class="column">
-        <h2 class="ui teal image header">
-            게시판 페이지
-        </h2>
-        <div class="ui large form">
-            <div class="ui stacked segment">
-               <button class="ui fluid large teal submit button">게시글 작성하기</button>
-                <table class="ui celled table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>제목</th>
-                            <th>등록자</th>
-                            <th>등록일</th>
-                        </tr>
-                    </thead>
-                    <tbody id="list">
-                        <tr>
-                            <td>a</td>
-                            <td>b</td>
-                            <td>c</td>
-                            <td>d</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="ui error message"></div>
-
-        </div>
+{% block content %}
+<div style="width:1000px;">
+    <div style="float: right; margin-bottom: 10px;">
+       <select id="SearchType" name="SearchType">
+          <option value="title">title</option>
+          <option value="contents">contents</option>
+          <option value="id">id</option>
+       </select>
+       <input type="text" id="SearchText" name="SearchText" />
+       <input type="button" id="SearchBtn" name="SearchBtn" value="Search" class="btn"/>
+       <input type="button" id="WriteBtn" name="WriteBtn" value="Write" class="btn"/>
     </div>
-</div>
+    <div>
+       <table style="width:100%;">
+          <colgroup>
+             <col width="10%;">
+             <col width="20%;">
+             <col width="45%;">
+             <col width="10%;">
+             <col width="15%;">
+          </colgroup>
+          <tbody id="list">
+             <tr style="background-color:lightseagreen;">
+                <th></th>
+                <th>제목</th>
+                <th>네용</th>
+                <th>아이디</th>
+                <th>날짜</th>
+             </tr>
+             <!-- <tr>
+                <td>1</td>
+                <td>제목테스트</td>
+                <td>ddd</td>
+                <td>dgseo</td>
+                <td>2019-10-05</td>
+             </tr> -->
+             </tbody>
+       </table>
+    </div>
+ </div>
+{% endblock %}
 
-<button type="button" onclick="test();">ddddd</button>
+{% block extent %}
+    {{ super() }}
+    <script>
+        get_board_list()
 
-<script src="{{url_for('static',filename='js/common.js')}}"></script>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<script>
-function test()
-{
-    var tr = $("<tr></tr>").attr("data-id", "test").appendTo("#list");
-    //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
-    $("<td></td>").text("a").addClass("view_btn").appendTo(tr);
-    $("<td></td>").text("b").addClass("view_btn").appendTo(tr);
-    $("<td></td>").text("C").addClass("view_btn").appendTo(tr);
-    $("<td></td>").text("D").addClass("view_btn").appendTo(tr);
-
-    var token = sessionStorage.getItem('token')
-    console.log(token)
-}
-</script> -->
+        function get_board_list()
+        {
+            var token = sessionStorage.getItem('token');
+            if(token == undefined)
+            {
+                alert("None token")
+            }
+            else
+            {
+                $.ajax({
+                type: 'GET',
+                url: api.url + '/board/-1',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader("Authorization",token);
+                },
+                success: function (response) {
+                    var resultCode = response['resultCode'];
+                    var resultMsg = response['resultMsg'];
+                    if(resultCode == 200)
+                    {   
+                        for (var i = 0; i < resultMsg.length; i++)
+                        {
+                            var tr = $("<tr></tr>").attr("data-id", "test").appendTo("#list");
+                            //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
+                            //$("<td></td>").text("a").addClass("view_btn").appendTo(tr);
+                            $("<td></td>").text(i+1).appendTo(tr);
+                            $("<td></td>").text(resultMsg[i].title).appendTo(tr);
+                            $("<td></td>").text(resultMsg[i].content).appendTo(tr);
+                            $("<td></td>").text(resultMsg[i].writer).appendTo(tr);
+                            var dt = Date.parse(resultMsg[i].create_at)
+                            var date = new Date(dt)
+                            var year = date.getFullYear().toString()
+                            var month = date.getMonth().toString()
+                            var day = date.getDay().toString()
+                            var hour = date.getHours().toString()
+                            var minutes = date.getMinutes().toString()
+                            var second = date.getSeconds().toString()
+                            $("<td></td>").text(year+'-'+month+'-'+day+' '+hour+':'+minutes+':'+second).appendTo(tr);
+                        }
+                    }
+                },
+                error: function(xhr, exception) {
+                    console.log("error_status : " + xhr.status);
+                    console.log("error_Msg : " + xhr.responseText);
+                    var err = JSON.parse(xhr.responseText);
+                    console.log("error_resultCode : " + err['resultCode'])
+                    alert(err['resultMsg']);
+                    if(err['resultCode'] == 406 || err['resultCode'] == 401)
+                    {
+                        sessionStorage.removeItem('token');
+                        window.location.href = "/index"
+                    }
+                },
+                complete: function(response, status, xhr) {
+                    console.log(response);
+                }
+            });
+            }
+        }
+    </script>
+{% endblock %}
