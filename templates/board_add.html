@@ -1,0 +1,67 @@
+{% extends "index.html" %}
+
+{% block head %}
+    {{ super() }}
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" src="{{url_for('static',filename='css/dashboard.css')}}">    
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <div class="two">
+        <span>writer</span>
+        <input type="text" id="writer" name="writer" />
+    </div>
+    <div class="two">
+        <span>Title</span>
+        <input type="text" id="title" name="title" />
+    </div>
+    </br>
+    <div class="three">
+        <span>Contents</span>
+        <textarea id="contents" name="contents"></textarea>
+    </div>
+    <div class="four" style="text-align: center; margin-top: 10px;">
+        <input type="button" id="SaveBtn" name="SaveBtn" value="Save" onclick="onclick_save();" class="btn"/>
+        <input type="button" id="BackBtn" name="BackBtn" value="Back" onclick="onclick_back();" class="btn"/>
+    </div>
+</div>
+{% endblock %}
+
+{% block extent %}
+    {{ super() }}
+    <script>
+    function onclick_save()
+    {   
+        var writer = $('#writer').val();
+        var title = $('#title').val();
+        var content = $('#contents').val();
+        var token = sessionStorage.getItem('token');
+        $.ajax({
+            type: 'POST',
+            url: api.url + '/board',
+            data:  JSON.stringify({"writer": writer, "title": title, "content": content}),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Content-type","application/json");
+                xhr.setRequestHeader("Authorization",token);
+            },
+            success: function (response) {
+                alert('success')
+                window.location.href = "/board"
+            },
+            error: function(xhr, exception) {
+                CommonErros(xhr, exception)
+            }
+        });
+    }
+
+    function onclick_back()
+    {
+        window.location.href = "/board"
+    }
+    </script>
+{% endblock %}
+

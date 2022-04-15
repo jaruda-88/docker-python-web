@@ -32,7 +32,6 @@
                 <div class="link">
                     <ul>
                         <li><a href="/index">Home</a></li>
-                        <!-- <li><a id="board" href="/board">board</a></li> -->
                         <li><a id="board" href='javascript:void(0);' onclick="onclick_board();">Board</a></li>
                     </ul>
                 </div>
@@ -47,12 +46,11 @@
                     <button type="button" onclick="logout()">logout</button>
                 </div>
             </div>
+            {% block header %}
+            {% endblock %}
         </header>
         </br></br>
         <main role="index">
-            <!-- <div>
-                <iframe id="view_voard" src="/board" style="width:100%; height:auto; border: 1px solid black"></iframe>
-            </div> -->
             {% block content %}
             {% endblock %}
         </main>
@@ -60,10 +58,10 @@
     {% block extent %}
     <script>
         $("#view_voard").css("display","none");
-
         check_token();        
 
-        function post_login() {
+        function post_login() 
+        {
             var id = $('#userid').val();
             var pw = $('#password').val();
             $.ajax({
@@ -95,11 +93,13 @@
             });
         }
 
-        function register(){
+        function register()
+        {
             window.location.href = "/register"
         }
 
-        function onclick_board(){
+        function onclick_board()
+        {
             if(check_token() == false)
             {
                 alert("please singin");
@@ -107,25 +107,12 @@
             else
             {
                 window.location.href = "/board"
-
-                // $.ajax({
-                //     type: "POST",
-                //     url: "/board",
-                //     data: {"token": sessionStorage.getItem('token')},
-                //     success: function(res){
-                //         //window.location.href = "/board"
-                //     },
-                //     error: function() {
-                //         location.reload();
-                //     }
-                // })
             }
-            //$("#view_voard").css("display","block");
         }
 
-        function logout(){
-            sessionStorage.removeItem('token');
-            window.location.href = "/index"
+        function logout()
+        {
+            DeleteToken()
         }      
         
         function check_token()
@@ -168,19 +155,17 @@
                     if(resultCode == 200)
                     {
                         $('#msg').text("signin : " + resultMsg['userid']);
+                        document.getElementById('msg').setAttribute("name", resultMsg['id']);
+
+                        if (document.getElementById("writer"))
+                        {
+                            document.getElementById("writer").value = resultMsg['userid']
+                        }
                     }
                 },
                 error: function(xhr, exception) {
-                    console.log("error_status : " + xhr.status);
-                    console.log("error_Msg : " + xhr.responseText);
-                    var err = JSON.parse(xhr.responseText);
-                    console.log("error_resultCode : " + err['resultCode'])
-                    alert(err['resultMsg']);
-                    if(err['resultCode'] == 406 || err['resultCode'] == 401)
-                    {
-                        sessionStorage.removeItem('token');
-                        location.reload();
-                    }
+                    CommonErros(xhr, exception)
+                    window.location.href = "/index"
                 },
                 complete: function(response, status, xhr) {
                     console.log(response);

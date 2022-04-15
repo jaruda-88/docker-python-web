@@ -17,3 +17,22 @@ let api = {
     }
 };
 
+
+function DeleteToken()
+{
+    sessionStorage.removeItem('token');    
+};
+
+function CommonErros(xhr, exception)
+{
+    console.log("error_status : " + xhr.status);
+    console.log("error_Msg : " + xhr.responseText);
+    var err = JSON.parse(xhr.responseText);
+    console.log("error_resultCode : " + err['resultCode'])
+    alert(err['resultMsg']);
+    if(code == 406 || code == 401)
+    {
+        DeleteToken();
+    }
+};
+
