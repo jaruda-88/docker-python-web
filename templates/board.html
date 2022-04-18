@@ -22,16 +22,14 @@
        <table style="width:100%;">
           <colgroup>
              <col width="5%;">
-             <col width="20%;">
-             <col width="45%;">
+             <col width="50%;">
              <col width="10%;">
-             <col width="20%;">
+             <col width="35%;">
           </colgroup>
           <tbody>
             <tr style="background-color:lightseagreen;">
                 <th></th>
                 <th>제목</th>
-                <th>내용</th>
                 <th>작성자</th>
                 <th>날짜</th>
              </tr>
@@ -47,24 +45,28 @@
              </tbody>
        </table>
     </div>
+    <div id='page' style="text-align:center; margin-top:10px;">
+
+    </div>
  </div>
 {% endblock %}
 
 {% block extent %}
     {{ super() }}
     <script>
-        get_board_list('/board/-1')
+        get_board_list('/board/page/0/' + board.page_limit)
 
         function clear_tr()
         {
-            var $table = document.getElementById('list');
-            if ($table.rows.length > 0)
-            {
-                for(let i=0; i <= $table.rows.length; i++)
-                { 
-                    $table.deleteRow(-1); 
-                }
-            }
+            $("#list").html("")
+            // var $table = document.getElementById('list');
+            // if ($table.rows.length > 0)
+            // {
+            //     for(let i=0; i <= $table.rows.length; i++)
+            //     { 
+            //         $table.deleteRow(-1); 
+            //     }
+            // }
         }
 
         function get_board_list(uri)
@@ -89,24 +91,33 @@
                     var resultMsg = response['resultMsg'];
                     if(resultCode == 200)
                     {   
-                        for (var i = 0; i < resultMsg.length; i++)
+                        for (var i = 0; i < resultMsg.list.length; i++)
                         {
-                            var tr = $("<tr></tr>").attr("id", resultMsg[i].id).appendTo("#list");
+                            var item = resultMsg.list[i]
+                            var tr = $("<tr></tr>").attr("id", item.id).appendTo("#list");
                             //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
                             //$("<td></td>").text("a").addClass("view_btn").appendTo(tr);
-                            $("<td></td>").text(i+1).appendTo(tr);
-                            $("<td></td>").text(resultMsg[i].title).appendTo(tr);
-                            $("<td></td>").text(resultMsg[i].content).appendTo(tr);
-                            $("<td></td>").text(resultMsg[i].writer).appendTo(tr);
-                            var dt = Date.parse(resultMsg[i].update_at)
+                            $("<td></td>").text(item.id).appendTo(tr);
+                            $("<td></td>").text(item.title).appendTo(tr);
+                            $("<td></td>").text(item.writer).appendTo(tr);
+                            var dt = Date.parse(item.update_at)
                             var date = new Date(dt)
-                            var year = date.getFullYear().toString()
-                            var month = date.getMonth().toString().padStart(2,'0')
-                            var day = date.getDay().toString().padStart(2,'0')
-                            var hour = date.getHours().toString().padStart(2,'0')
-                            var minutes = date.getMinutes().toString().padStart(2,'0')
-                            var second = date.getSeconds().toString().padStart(2,'0')
-                            $("<td></td>").text(year+'-'+month+'-'+day+' '+hour+':'+minutes+':'+second).appendTo(tr);
+                            $("<td></td>").text(date.toGMTString()).appendTo(tr);
+                        }
+
+                        var count = resultMsg.count;
+                        var num_f = count / board.page_limit;
+                        var num = parseInt(count / board.page_limit);
+                        var roop = num_f > num ? num + 1 : num;
+                        
+                        $("#page").html("")
+                        for (var i = 0; i < roop; i++)
+                        {
+                            $("#page").append(
+                                "<a id="+"'" + i.toString() +"'" + 
+                                "href='javascript:void(0);' onclick='onclick_page(this)'>" + 
+                                (i+1).toString() + "</a>&nbsp;"
+                                );
                         }
                     }
                 },
@@ -118,6 +129,11 @@
                 }
             });
             }
+        }
+
+        function onclick_page(target)
+        {
+            get_board_list('/board/page/' + target.id +'/' + board.page_limit)
         }
 
         function onclick_search()

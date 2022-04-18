@@ -18,9 +18,15 @@ let api = {
 };
 
 
+let board = {
+    page_limit: 5
+}
+
+
 function DeleteToken()
 {
     sessionStorage.removeItem('token');    
+    window.location.href = "/index"
 };
 
 function CommonErros(xhr, exception)
@@ -30,6 +36,7 @@ function CommonErros(xhr, exception)
     var err = JSON.parse(xhr.responseText);
     console.log("error_resultCode : " + err['resultCode'])
     alert(err['resultMsg']);
+    var code = err['resultCode']
     if(code == 406 || code == 401)
     {
         DeleteToken();
