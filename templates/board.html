@@ -54,9 +54,9 @@
 {% block extent %}
     {{ super() }}
     <script>
-        get_board_list('/board/page/0/' + board.page_limit)
+        get_board_list('default', '/board/page/0/' + board.page_limit)
 
-        function clear_tr()
+        function clear_table()
         {
             $("#list").html("")
             // var $table = document.getElementById('list');
@@ -69,7 +69,7 @@
             // }
         }
 
-        function get_board_list(uri)
+        function get_board_list(type, uri)
         {
             var token = sessionStorage.getItem('token');
             if(token == undefined)
@@ -78,7 +78,8 @@
             }
             else
             {
-                clear_tr();
+                clear_table();
+                
                 $.ajax({
                 type: 'GET',
                 url: api.url + uri,
@@ -91,18 +92,21 @@
                     var resultMsg = response['resultMsg'];
                     if(resultCode == 200)
                     {   
-                        for (var i = 0; i < resultMsg.list.length; i++)
+                        if (resultMsg.list?.length > 0)
                         {
-                            var item = resultMsg.list[i]
-                            var tr = $("<tr></tr>").attr("id", item.id).appendTo("#list");
-                            //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
-                            //$("<td></td>").text("a").addClass("view_btn").appendTo(tr);
-                            $("<td></td>").text(item.id).appendTo(tr);
-                            $("<td></td>").text(item.title).appendTo(tr);
-                            $("<td></td>").text(item.writer).appendTo(tr);
-                            var dt = Date.parse(item.update_at)
-                            var date = new Date(dt)
-                            $("<td></td>").text(date.toGMTString()).appendTo(tr);
+                            for (var i = 0; i < resultMsg.list.length; i++)
+                            {
+                                var item = resultMsg.list[i]
+                                var tr = $("<tr></tr>").attr("id", item.id).appendTo("#list");
+                                //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
+                                //$("<td></td>").text("a").addClass("view_btn").appendTo(tr);
+                                $("<td></td>").text(item.id).appendTo(tr);
+                                $("<td></td>").text(item.title).appendTo(tr);
+                                $("<td></td>").text(item.writer).appendTo(tr);
+                                var dt = Date.parse(item.update_at)
+                                var date = new Date(dt)
+                                $("<td></td>").text(date.toGMTString()).appendTo(tr);
+                            }
                         }
 
                         var count = resultMsg.count;
@@ -114,7 +118,8 @@
                         for (var i = 0; i < roop; i++)
                         {
                             $("#page").append(
-                                "<a id="+"'" + i.toString() +"'" + 
+                                "<a id="+"'" + i.toString() +"' " +
+                                "name='" + type + "' " +
                                 "href='javascript:void(0);' onclick='onclick_page(this)'>" + 
                                 (i+1).toString() + "</a>&nbsp;"
                                 );
@@ -133,7 +138,16 @@
 
         function onclick_page(target)
         {
-            get_board_list('/board/page/' + target.id +'/' + board.page_limit)
+            var uri = ''
+            var search = $('#SearchText').val();
+            switch(target.name)
+            {
+                case 'default': uri = '/board/page/' + target.id +'/' + board.page_limit; break;
+                case 'title': uri = "/board/"+target.name+"?"+target.name+'='+search+'&'+'num='+target.id+'&limit='+board.page_limit; break;
+                case 'content': uri = "/board/"+target.name+"?"+target.name+'='+search+'&'+'num='+target.id+'&limit='+board.page_limit; break;
+                case 'writer': uri = "/board/"+target.name+"?"+target.name+'='+search+'&'+'num='+target.id+'&limit='+board.page_limit; break;
+            }
+            get_board_list(target.name, uri)
         }
 
         function onclick_search()
@@ -141,7 +155,7 @@
             var selectOption = document.getElementById("SearchType");
             var selectVal = selectOption.options[selectOption.selectedIndex].value;
             var search = $('#SearchText').val();
-            get_board_list("/board/"+selectVal+"/"+search)
+            get_board_list(selectVal, "/board/"+selectVal+"?"+selectVal+'='+search+'&'+'num=0&limit='+board.page_limit)
         }
 
         function onclick_write()
