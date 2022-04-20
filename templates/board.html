@@ -7,6 +7,10 @@
 {% endblock %}
 
 {% block content %}
+<div id="post">
+    <iframe src="/board/post" id="the_iframe" onload="calcHeight();" frameborder="0" scrolling="no" style="overflow-x:hidden; overflow:auto; width:100%; min-height:300px;"></iframe>
+    <hr>
+</div>
 <div style="width:1000px;">
     <div style="float: right; margin-bottom: 10px;">
        <select id="SearchType" name="SearchType">
@@ -54,7 +58,23 @@
 {% block extent %}
     {{ super() }}
     <script>
+        $("#post").css("display","none");
         get_board_list('default', '/board/page/0/' + board.page_limit)
+
+        function calcHeight()
+        {
+            //find the height of the internal page
+        
+            var the_height=
+            document.getElementById('the_iframe').contentWindow.
+            document.body.scrollHeight;
+        
+            //change the height of the iframe
+            document.getElementById('the_iframe').height = the_height;
+        
+            //document.getElementById('the_iframe').scrolling = "no";
+            document.getElementById('the_iframe').style.overflow = "hidden";
+        }
 
         function clear_table()
         {
@@ -72,73 +92,68 @@
         function get_board_list(type, uri)
         {
             var token = sessionStorage.getItem('token');
-            if(token == undefined)
-            {
-                alert("None token")
-            }
-            else
-            {
-                clear_table();
+            clear_table();
                 
                 $.ajax({
-                type: 'GET',
-                url: api.url + uri,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-type","application/json");
-                    xhr.setRequestHeader("Authorization",token);
-                },
-                success: function (response) {
-                    var resultCode = response['resultCode'];
-                    var resultMsg = response['resultMsg'];
-                    if(resultCode == 200)
-                    {   
-                        if (resultMsg.list?.length > 0)
-                        {
-                            for (var i = 0; i < resultMsg.list.length; i++)
+                    type: 'GET',
+                    url: api.url + uri,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("Content-type","application/json");
+                        xhr.setRequestHeader("Authorization",token);
+                    },
+                    success: function (response) {
+                        var resultCode = response['resultCode'];
+                        var resultMsg = response['resultMsg'];
+                        if(resultCode == 200)
+                        {   
+                            if (resultMsg.list?.length > 0)
                             {
-                                var item = resultMsg.list[i]
-                                var tr = $("<tr></tr>").attr("id", item.id).appendTo("#list");
-                                //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
-                                //$("<td></td>").text("a").addClass("view_btn").appendTo(tr);
-                                $("<td></td>").text(item.id).appendTo(tr);
-                                $("<td></td>").text(item.title).attr('id', item.id.toString()).attr('onclick', 'onclick_row(this)').appendTo(tr);
-                                $("<td></td>").text(item.writer).appendTo(tr);
-                                var dt = Date.parse(item.update_at)
-                                var date = new Date(dt)
-                                $("<td></td>").text(date.toGMTString()).appendTo(tr);
+                                for (var i = 0; i < resultMsg.list.length; i++)
+                                {
+                                    var item = resultMsg.list[i]
+                                    var tr = $("<tr></tr>").attr("id", item.id).appendTo("#list");
+                                    //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
+                                    //$("<td></td>").text("a").addClass("view_btn").appendTo(tr);
+                                    $("<td></td>").text(item.id).appendTo(tr);
+                                    $("<td></td>").text(item.title).attr('id', item.id.toString()).attr('onclick', 'onclick_row(this)').appendTo(tr);
+                                    $("<td></td>").text(item.writer).appendTo(tr);
+                                    var dt = Date.parse(item.update_at)
+                                    var date = new Date(dt)
+                                    $("<td></td>").text(date.toGMTString()).appendTo(tr);
+                                }
+                            }
+                            
+                            $("#page").html("")
+
+                            var count = resultMsg.count;
+                            var num_f = count / board.page_limit;
+                            var num = parseInt(count / board.page_limit);
+                            var roop = num_f > num ? num + 1 : num;
+                            
+                            for (var i = 0; i < roop; i++)
+                            {
+                                $("#page").append(
+                                    "<a id="+"'" + i.toString() +"' " +
+                                    "name='" + type + "' " +
+                                    "href='javascript:void(0);' onclick='onclick_page(this)'>" + 
+                                    (i+1).toString() + "</a>&nbsp;"
+                                    );
                             }
                         }
-
-                        var count = resultMsg.count;
-                        var num_f = count / board.page_limit;
-                        var num = parseInt(count / board.page_limit);
-                        var roop = num_f > num ? num + 1 : num;
-                        
-                        $("#page").html("")
-                        for (var i = 0; i < roop; i++)
-                        {
-                            $("#page").append(
-                                "<a id="+"'" + i.toString() +"' " +
-                                "name='" + type + "' " +
-                                "href='javascript:void(0);' onclick='onclick_page(this)'>" + 
-                                (i+1).toString() + "</a>&nbsp;"
-                                );
-                        }
+                    },
+                    error: function(xhr, exception) {
+                        CommonErros(xhr, exception)
+                    },
+                    complete: function(response, status, xhr) {
+                        console.log(response);
                     }
-                },
-                error: function(xhr, exception) {
-                    CommonErros(xhr, exception)
-                },
-                complete: function(response, status, xhr) {
-                    console.log(response);
-                }
-            });
-            }
+                });
         }
 
         function onclick_row(target)
         {
-            window.location.href = "/board/detail?"+ "id=" +target.id.toString()
+            $("#post").css("display","block");
+            $("#the_iframe").attr('src', '/board/post'+"?id="+target.id.toString())
         }
 
         function onclick_page(target)

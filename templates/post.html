@@ -1,0 +1,76 @@
+<html lang="kr">
+    <head>
+        <meta charset="utf-8">
+        <script src="{{url_for('static',filename='js/common.js')}}"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <link rel="stylesheet" src="{{url_for('static',filename='css/dashboard.css')}}">    
+    </head>
+    <body>
+        <div class="wrapper">
+            <div>
+                <span>작성자</span>
+                <input type="text" id="writer" name="writer" style="width:300px;" disabled/>
+            </div>
+            <div>
+                <span>작성일</span>
+                <input type="text" id="create_at" name="create_at" style="width:300px;" disabled/>
+            </div>
+            <div>
+                <span>제목</span>
+                <input type="text" id="title" name="title" style="width:300px;" disabled/>
+            </div>
+            <div>
+                <span>내용</span></br>
+                <textarea id="contents" name="contents" style="resize: none; width:50%; min-height:300px;" readonly></textarea>
+            </div>
+            <div style="text-align: center; margin-top: 10px;">
+                <!-- <input type="button" id="SaveBtn" name="SaveBtn" value="Save" onclick="onclick_save();" class="btn"/> -->
+                <!-- <input type="button" id="BackBtn" name="BackBtn" value="Back" onclick="onclick_back();" class="btn"/> -->
+            </div>
+        </div>
+    </body>
+    <script>
+        var value = window.location.search
+        if (value.includes('id'))
+            get_boardinfo(value.split('=')[1])
+
+        function get_boardinfo(id)
+        {
+            console.log(id)
+            var token = sessionStorage.getItem('token');
+            $.ajax({
+                type: 'GET',
+                url: api.url + '/board/' + id,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader("Authorization",token);
+                },
+                success: function (response) {
+                    var resultCode = response['resultCode'];
+                    var resultMsg = response['resultMsg'];
+                    if(resultCode == 200)
+                    {   
+                        if (resultMsg.length > 0)
+                        {
+                            var item = resultMsg[0];
+                            document.getElementById("writer").value = item.writer;
+                            document.getElementById("create_at").value = item.create_at;
+                            document.getElementById("title").value = item.title;
+                            document.getElementById("contents").value = item.content;
+                        }
+                    }
+                },
+                error: function(xhr, exception) {
+                    document.getElementById("writer").value = "";
+                    document.getElementById("create_at").value = "";
+                    document.getElementById("title").value = "";
+                    document.getElementById("contents").value = "";
+                    CommonErros(xhr, exception)
+                },
+                complete: function(response, status, xhr) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
+</html>

@@ -8,8 +8,7 @@ def board():
     return render_template('board.html')
 
 
-@bp.route('/detail')
-def board_detail():
-    id = request.args.get('id')
-    print(id)
-    return render_template('board_detail.html')
+@bp.route('/post')
+def post():
+    # id = request.args.get('id')
+    return render_template('post.html')
