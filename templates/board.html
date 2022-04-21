@@ -50,7 +50,6 @@
        </table>
     </div>
     <div id='page' style="text-align:center; margin-top:10px;">
-
     </div>
  </div>
 {% endblock %}
@@ -59,7 +58,8 @@
     {{ super() }}
     <script>
         $("#post").css("display","none");
-        get_board_list('default', '/board/page/0/' + board.page_limit)
+        get_board_list('all', '/board/page/0/' + board.page_limit)
+        
 
         function calcHeight()
         {
@@ -152,8 +152,9 @@
 
         function onclick_row(target)
         {
+            $("#the_iframe").attr('src', '/board/post'+"?id="+target.id.toString()+"-"+
+            document.getElementById("msg").getAttribute('name'))
             $("#post").css("display","block");
-            $("#the_iframe").attr('src', '/board/post'+"?id="+target.id.toString())
         }
 
         function onclick_page(target)
@@ -162,10 +163,9 @@
             var search = $('#SearchText').val();
             switch(target.name)
             {
-                case 'default': uri = '/board/page/' + target.id +'/' + board.page_limit; break;
-                case 'title': uri = "/board/"+target.name+"?"+target.name+'='+search+'&'+'num='+target.id+'&limit='+board.page_limit; break;
-                case 'content': uri = "/board/"+target.name+"?"+target.name+'='+search+'&'+'num='+target.id+'&limit='+board.page_limit; break;
-                case 'writer': uri = "/board/"+target.name+"?"+target.name+'='+search+'&'+'num='+target.id+'&limit='+board.page_limit; break;
+                case 'all': uri = '/board/page/' + target.id +'/' + board.page_limit; break;
+                default: uri = "/board/"+target.name+"?"+'num='+target.id+'&limit='+board.page_limit+'&'+target.name+'='+search; break;
+                //case 'writer': uri = "/board/"+target.name+"?"+target.name+'='+search+'&'+'num='+target.id+'&limit='+board.page_limit; break; 
             }
             get_board_list(target.name, uri)
         }
@@ -180,7 +180,7 @@
 
         function onclick_write()
         {
-            window.location.href = "/board_add"
+            window.location.href = "/board_add"+"?"+"id="+$('#msg').text().split(':')[1].replace(' ', '')
         }
     </script>
 {% endblock %}

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, redirect, render_template, request, url_for
 
 
 bp = Blueprint('board', __name__, url_prefix='/board')
@@ -12,3 +12,8 @@ def board():
 def post():
     # id = request.args.get('id')
     return render_template('post.html')
+
+
+@bp.route('/comment')
+def comment():
+    return render_template('comment.html')

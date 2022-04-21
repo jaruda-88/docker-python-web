@@ -156,11 +156,6 @@
                     {
                         $('#msg').text("signin : " + resultMsg['userid']);
                         document.getElementById('msg').setAttribute("name", resultMsg['id']);
-
-                        if (document.getElementById("writer"))
-                        {
-                            document.getElementById("writer").value = resultMsg['userid']
-                        }
                     }
                 },
                 error: function(xhr, exception) {

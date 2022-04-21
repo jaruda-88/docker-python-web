@@ -13,7 +13,7 @@
 <div class="wrapper">
     <div class="one">
         <span>writer</span>
-        <input type="text" id="writer" name="writer" />
+        <input type="text" id="writer" name="writer" disabled/>
     </div>
     <div class="two">
         <span>Title</span>
@@ -34,6 +34,10 @@
 {% block extent %}
     {{ super() }}
     <script>
+    var value = window.location.search
+    if (value.includes('id'))
+        document.getElementById("writer").value = value.split('=')[1]
+    
     function onclick_save()
     {   
         var writer = $('#writer').val();
