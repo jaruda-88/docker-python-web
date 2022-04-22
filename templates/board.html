@@ -152,8 +152,9 @@
 
         function onclick_row(target)
         {
-            $("#the_iframe").attr('src', '/board/post'+"?id="+target.id.toString()+"-"+
-            document.getElementById("msg").getAttribute('name'))
+            // $("#the_iframe").attr('src', '/board/post'+"?id="+target.id.toString()+"-"+
+            // document.getElementById("msg").getAttribute('name'))
+            $("#the_iframe").attr('src', '/board/post'+"?id="+target.id.toString())
             $("#post").css("display","block");
         }
 
@@ -175,7 +176,7 @@
             var selectOption = document.getElementById("SearchType");
             var selectVal = selectOption.options[selectOption.selectedIndex].value;
             var search = $('#SearchText').val();
-            get_board_list(selectVal, "/board/"+selectVal+"?"+selectVal+'='+search+'&'+'num=0&limit='+board.page_limit)
+            get_board_list(selectVal, "/board/"+selectVal+"?"+'num=0&limit='+board.page_limit+"&"+selectVal+'='+search)
         }
 
         function onclick_write()
