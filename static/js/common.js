@@ -19,7 +19,8 @@ let api = {
 
 
 let board = {
-    page_limit: 5
+    page_limit: 5,
+    comment_page_limit: 5
 }
 
 
@@ -42,6 +43,8 @@ function CommonErros(xhr, exception)
         DeleteToken();
     }
 };
+
+
 
 
 

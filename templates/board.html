@@ -8,49 +8,58 @@
 
 {% block content %}
 <div id="post">
-    <iframe src="/board/post" id="the_iframe" onload="calcHeight();" frameborder="0" scrolling="no" style="overflow-x:hidden; overflow:auto; width:100%; min-height:300px;"></iframe>
+    <iframe src="/board/post" id="board_iframe" onload="calcHeight(this);" frameborder="0" scrolling="no" style="overflow-x:hidden; overflow:auto; width:100%; min-height:100px;"></iframe>
     <hr>
 </div>
-<div style="width:1000px;">
+<div id="comment">
+    <iframe src="/board/comment" id="comment_iframe" frameborder="0" scrolling="no" style="overflow-x:hidden; overflow:auto; width:50%; min-height:600px;"></iframe>
+    <hr>
+</div>
+<div style="width:1000px; min-height:500px;">
     <div style="float: right; margin-bottom: 10px;">
-       <select id="SearchType" name="SearchType">
-          <option value="title">제목</option>
-          <option value="content">내용</option>
-          <option value="writer">작성자</option>
-       </select>
-       <input type="text" id="SearchText" name="SearchText" />
-       <input type="button" id="SearchBtn" name="SearchBtn" value="Search" onclick="onclick_search();" class="btn"/>
-       <input type="button" id="WriteBtn" name="WriteBtn" value="Write" onclick="onclick_write();" class="btn"/>
+        <!--- 검색 드롭박스 -->
+        <select id="SearchType" name="SearchType">
+            <option value="title">제목</option>
+            <option value="content">내용</option>
+            <option value="writer">작성자</option>
+        </select> <!--- 검색 드롭박스 끝 -->
+        <!--- 검색 버튼/입력 -->
+        <input type="text" id="SearchText" name="SearchText" />
+        <input type="button" id="SearchBtn" name="SearchBtn" value="Search" onclick="onclick_search();" class="btn"/>        
+        <input type="button" id="WriteBtn" name="WriteBtn" value="Write" onclick="onclick_write();" class="btn"/> <!--- 검색 버튼/입력 끝 -->
     </div>
     <div>
-       <table style="width:100%;">
-          <colgroup>
-             <col width="5%;">
-             <col width="50%;">
-             <col width="10%;">
-             <col width="35%;">
-          </colgroup>
-          <tbody>
+        <table style="width:100%;">
+            <colgroup>
+                <col width="5%;">
+                <col width="50%;">
+                <col width="10%;">
+                <col width="35%;">
+            </colgroup>
+            <!--- 게시판 타이틀 -->
+            <tbody>
             <tr style="background-color:lightseagreen;">
                 <th></th>
                 <th>제목</th>
                 <th>작성자</th>
                 <th>날짜</th>
-             </tr>
-          </tbody>
-          <tbody id="list">             
-             <!-- <tr>
+                </tr>
+            </tbody> <!--- 게시판 타이틀 끝 -->
+            <!--- 게시판 목록 -->
+            <tbody id="list">             
+                 <tr>
                 <td>1</td>
                 <td>제목테스트</td>
                 <td>ddd</td>
                 <td>dgseo</td>
                 <td>2019-10-05</td>
-             </tr> -->
-             </tbody>
+                </tr>
+            </tbody><!--- 게시판 목록 끝-->
        </table>
     </div>
+    <!--- 게시판 페이지 -->
     <div id='page' style="text-align:center; margin-top:10px;">
-    </div>
+    </div><!--- 게시판 페이지 끝 -->
  </div>
 {% endblock %}
 
@@ -58,22 +67,21 @@
     {{ super() }}
     <script>
         $("#post").css("display","none");
+        $("#comment").css("display","none");
         get_board_list('all', '/board/page/0/' + board.page_limit)
         
 
-        function calcHeight()
+        function calcHeight(target)
         {
             //find the height of the internal page
         
-            var the_height=
-            document.getElementById('the_iframe').contentWindow.
-            document.body.scrollHeight;
+            var the_height = target.contentWindow.document.body.scrollHeight;
         
             //change the height of the iframe
-            document.getElementById('the_iframe').height = the_height;
+            target.height = the_height;
         
             //document.getElementById('the_iframe').scrolling = "no";
-            document.getElementById('the_iframe').style.overflow = "hidden";
+            target.style.overflow = "hidden";
         }
 
         function clear_table()
@@ -94,68 +102,71 @@
             var token = sessionStorage.getItem('token');
             clear_table();
                 
-                $.ajax({
-                    type: 'GET',
-                    url: api.url + uri,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("Content-type","application/json");
-                        xhr.setRequestHeader("Authorization",token);
-                    },
-                    success: function (response) {
-                        var resultCode = response['resultCode'];
-                        var resultMsg = response['resultMsg'];
-                        if(resultCode == 200)
-                        {   
-                            if (resultMsg.list?.length > 0)
+            $.ajax({
+                type: 'GET',
+                url: api.url + uri,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader("Authorization",token);
+                },
+                success: function (response) {
+                    var resultCode = response['resultCode'];
+                    var resultMsg = response['resultMsg'];
+                    if(resultCode == 200)
+                    {   
+                        if (resultMsg.list?.length > 0)
+                        {
+                            for (var i = 0; i < resultMsg.list.length; i++)
                             {
-                                for (var i = 0; i < resultMsg.list.length; i++)
-                                {
-                                    var item = resultMsg.list[i]
-                                    var tr = $("<tr></tr>").attr("id", item.id).appendTo("#list");
-                                    //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
-                                    //$("<td></td>").text("a").addClass("view_btn").appendTo(tr);
-                                    $("<td></td>").text(item.id).appendTo(tr);
-                                    $("<td></td>").text(item.title).attr('id', item.id.toString()).attr('onclick', 'onclick_row(this)').appendTo(tr);
-                                    $("<td></td>").text(item.writer).appendTo(tr);
-                                    var dt = Date.parse(item.update_at)
-                                    var date = new Date(dt)
-                                    $("<td></td>").text(date.toGMTString()).appendTo(tr);
-                                }
-                            }
-                            
-                            $("#page").html("")
-
-                            var count = resultMsg.count;
-                            var num_f = count / board.page_limit;
-                            var num = parseInt(count / board.page_limit);
-                            var roop = num_f > num ? num + 1 : num;
-                            
-                            for (var i = 0; i < roop; i++)
-                            {
-                                $("#page").append(
-                                    "<a id="+"'" + i.toString() +"' " +
-                                    "name='" + type + "' " +
-                                    "href='javascript:void(0);' onclick='onclick_page(this)'>" + 
-                                    (i+1).toString() + "</a>&nbsp;"
-                                    );
+                                var item = resultMsg.list[i]
+                                var tr = $("<tr></tr>").attr("id", item.id).appendTo("#list");
+                                //tr에 td테이블 추가 및 클래스 추가 + 텍스트 수정
+                                //$("<td></td>").text("a").addClass("view_btn").appendTo(tr);
+                                $("<td></td>").text(item.id).appendTo(tr);
+                                $("<td></td>").text(item.title).attr('onclick', "onclick_row("+item.id+")").appendTo(tr);
+                                $("<td></td>").text(item.writer).appendTo(tr);
+                                var dt = Date.parse(item.update_at)
+                                var date = new Date(dt)
+                                $("<td></td>").text(date.toGMTString()).appendTo(tr);
                             }
                         }
-                    },
-                    error: function(xhr, exception) {
-                        CommonErros(xhr, exception)
-                    },
-                    complete: function(response, status, xhr) {
-                        console.log(response);
+                        
+                        $("#page").html("")
+
+                        var count = resultMsg.count;
+                        var num_f = count / board.page_limit;
+                        var num = parseInt(count / board.page_limit);
+                        var roop = num_f > num ? num + 1 : num;
+                        
+                        for (var i = 0; i < roop; i++)
+                        {
+                            $("#page").append(
+                                "<a id="+"'" + i.toString() +"' " +
+                                "name='" + type + "' " +
+                                "href='javascript:void(0);' onclick='onclick_page(this)'>" + 
+                                (i+1).toString() + "</a>&nbsp;"
+                                );
+                        }
                     }
-                });
+                },
+                error: function(xhr, exception) {
+                    CommonErros(xhr, exception)
+                },
+                complete: function(response, status, xhr) {
+                    console.log(response);
+                }
+            });
         }
 
-        function onclick_row(target)
+        function onclick_row(id)
         {
-            // $("#the_iframe").attr('src', '/board/post'+"?id="+target.id.toString()+"-"+
-            // document.getElementById("msg").getAttribute('name'))
-            $("#the_iframe").attr('src', '/board/post'+"?id="+target.id.toString())
+            $("#board_iframe").attr('src', '/board/post'+"?id="+id.toString())
             $("#post").css("display","block");
+            
+            $("#comment").css("display","block");
+
+            $("#comment_iframe").attr('src', '/board/comment'+"?id="+id.toString()+"&"+
+            document.getElementById("msg").getAttribute('name'))
         }
 
         function onclick_page(target)
@@ -166,7 +177,6 @@
             {
                 case 'all': uri = '/board/page/' + target.id +'/' + board.page_limit; break;
                 default: uri = "/board/"+target.name+"?"+'num='+target.id+'&limit='+board.page_limit+'&'+target.name+'='+search; break;
-                //case 'writer': uri = "/board/"+target.name+"?"+target.name+'='+search+'&'+'num='+target.id+'&limit='+board.page_limit; break; 
             }
             get_board_list(target.name, uri)
         }

@@ -3,15 +3,149 @@
         <meta charset="utf-8">
         <script src="{{url_for('static',filename='js/common.js')}}"></script>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-        <link rel="stylesheet" src="{{url_for('static',filename='css/dashboard.css')}}">    
+        <style>
+            .dat_input{ 
+                position: absolute; 
+                bottom: 2px;
+            }
+        </style>
     </head>
     <body>
-        <div>
-            <span>내용</span></br>
-            <textarea id="contents" name="contents" style="resize: none; width:50%; min-height:300px;" readonly></textarea>
-        </div>
+        <!--- 댓글 목록 -->
+        <h3>댓글목록</h3>
+        <div class="dat">
+            <div class="dat_list" id="comment_list">
+                <div>
+                    <div id="userid">
+                        <b>ㅇㅇ</b>
+                    </div>
+                    <div id="content">ㅇㅇㅇㅇ</div>
+                    <div id="create_at" >ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ</div>        
+                </div>
+            </div>
+            <!--- 댓글 페이지 -->
+            <div id='comment_page' style="text-align:center; margin-top:10px;">
+            </div><!--- 댓글 페이지 끝 -->
+            <div class="dat_input" id="comment_input" style="float:bottom;">
+                <input type="hidden" name="dat_user" id="dat_user" class="dat_user" size="15" placeholder="아이디" value="dd" />
+                <div style="margin-top:10px; ">
+                    <textarea name="content" class="reply_content" id="re_content" style="resize: none; width:800px; min-height:50px;"></textarea>
+                    <button id="rep_bt" class="re_bt" onclick="onclick_commentRegister()">댓글</button>
+                </div>
+            </div> <!--- 댓글 입력 폼 끝 -->
+        </div> <!--- 댓글 목록 끝 -->
+        <!--- 댓글 입력 폼 -->
     </body>
     <script>
-        
+        var query = window.location.search;
+        var userId = -1;
+        var boardId = -1;
+        var pageNum = -1;
+        if (query.includes('id'))
+        {
+            var value = query.split('=')[1];
+            var data = value.split('&')
+            boardId = data[0];
+            userId = data[1];
+            pageNum = 0;
+            get_commentinfo(pageNum, board.comment_page_limit, boardId);
+        }
+
+        function get_commentinfo(num, limit, id)
+        {
+            var token = sessionStorage.getItem('token');
+            $.ajax({
+                type: 'GET',
+                url: api.url + '/board/comment/page?num='+num.toString()+"&limit="+limit.toString()+"&board_id="+id,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader("Authorization",token);
+                },
+                success: function (response) {
+                    var resultCode = response['resultCode'];
+                    var resultMsg = response['resultMsg'];
+                    if(resultCode == 200)
+                    {
+                        $("#comment_list").html("");
+
+                        if (resultMsg.list?.length > 0)
+                        {
+                            for (var i = 0; i < resultMsg.list.length; i++)
+                            {
+                                var item = resultMsg.list[i];
+                                var dat = $("<div></div>").appendTo("#comment_list");
+                                var writer = $("<div></div>").appendTo(dat);
+                                $("<b></b>").text(item.writer).appendTo(writer);
+                                $("<div></div>").text(item.content).appendTo(dat);
+                                var create_at = Date.parse(item.create_at);
+                                var dt = new Date(create_at);
+                                $("<div></div>").text(dt.toGMTString()).appendTo(dat);
+                                $("<hr>").appendTo(dat);
+                            }
+                        }
+
+                        $("#comment_page").html("")
+
+                        var count = resultMsg.count;
+                        if (count == 0)
+                            pageNum = -1;
+                        var num_f = count / board.comment_page_limit;
+                        var num = parseInt(count / board.comment_page_limit);
+                        var roop = num_f > num ? num + 1 : num;
+                        
+                        var cal = (74 * resultMsg.list.length) + (10 * resultMsg.list.length) + 132;
+                        $('#comment_iframe', parent.document).css("min-height", cal.toString()+'px');
+
+                        for (var i = 0; i < roop; i++)
+                        {
+                            $("#comment_page").append(
+                                "<a id="+"'" + i.toString() +"' " +
+                                "href='javascript:void(0);' onclick='onclick_commentPage(this)'>" + 
+                                (i+1).toString() + "</a>&nbsp;"
+                                );
+                        }
+                    }
+                },
+                error: function(xhr, exception) {
+                    CommonErros(xhr, exception)
+                },
+                complete: function(response, status, xhr) {
+                    console.log(response);
+                }
+            });
+        }
+
+        function onclick_commentPage(target)
+        {
+            pageNum = target.id
+            get_commentinfo(pageNum, board.comment_page_limit, boardId)
+        }
+
+        function onclick_commentRegister()
+        {
+            var content = $('#re_content').val();
+            var token = sessionStorage.getItem('token');
+            $.ajax({
+                type: 'POST',
+                url: api.url + '/board/comment',
+                data:  JSON.stringify({"user_id": parseInt(userId), "board_id": parseInt(boardId), "content": content}),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader("Authorization",token);
+                },
+                success: function (response) {
+                    var resultCode = response['resultCode'];
+                    var resultMsg = response['resultMsg'];
+                    if (resultMsg == "Ok")
+                    {
+                        pageNum = pageNum == -1 ? 0 : pageNum;
+                        get_commentinfo(pageNum, board.comment_page_limit, boardId)
+                    }
+                },
+                error: function(xhr, exception) {
+                    CommonErros(xhr, exception)
+                }
+            });
+        }
     </script>
 </html>

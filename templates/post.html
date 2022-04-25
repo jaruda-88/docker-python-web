@@ -6,6 +6,7 @@
         <link rel="stylesheet" src="{{url_for('static',filename='css/dashboard.css')}}">    
     </head>
     <body>
+        <!--- 글 내용 상세 -->
         <div class="wrapper">
             <div>
                 <span>작성자</span>
@@ -22,9 +23,7 @@
             <div>
                 <span>내용</span></br>
                 <textarea id="contents" name="contents" style="resize: none; width:50%; min-height:300px;" readonly></textarea>
-            </div>
-            <div id="comment">
-            </div>
+            </div> <!--- 글 내용 상세 끝 -->
         </div>
     </body>
     <script>
@@ -37,7 +36,6 @@
 
         function get_boardinfo(id)
         {
-            console.log(id)
             var token = sessionStorage.getItem('token');
             $.ajax({
                 type: 'GET',
