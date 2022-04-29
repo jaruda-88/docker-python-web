@@ -49,9 +49,9 @@
                     var resultMsg = response['resultMsg'];
                     if(resultCode == 200)
                     {   
-                        if (resultMsg.length > 0)
+                        if (resultMsg)
                         {
-                            var item = resultMsg[0];
+                            var item = resultMsg;
                             document.getElementById("writer").value = item.writer;
                             document.getElementById("create_at").value = item.create_at;
                             document.getElementById("title").value = item.title;
