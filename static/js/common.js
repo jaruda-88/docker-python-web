@@ -6,7 +6,7 @@ let api = {
         switch(this.type)
         {
             case "server":
-                return 'http://3.38.135.214:5040/api';
+                return 'http://3.35.205.101:5040/api';
             case "local":
                 return 'http://192.168.1.69:5040/api';
             case "develop":
