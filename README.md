@@ -14,5 +14,5 @@
 <h5 align="center">
 <img src="https://img.shields.io/badge/css-success"/>
 <img src="https://img.shields.io/badge/AJAX-lightgrey"/>
-<img src="https://img.shields.io/badge/EC2-blue"/>
+<img src="https://img.shields.io/badge/AWS%20EC2-blue"/>
 </h5>
